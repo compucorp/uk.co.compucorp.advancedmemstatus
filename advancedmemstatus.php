@@ -161,3 +161,11 @@ function advancedmemstatus_civicrm_navigationMenu(&$menu) {
   ));
   _advancedmemstatus_civix_navigationMenu($menu);
 } // */
+
+
+
+function advancedmemstatus_civicrm_alterCalculatedMembershipStatus(&$membershipStatus, $arguments, $membership) {
+  $membershipStatusCalculator = new CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator($membershipStatus, $arguments, $membership);
+  $membershipStatusCalculator->calculate();
+}
+
