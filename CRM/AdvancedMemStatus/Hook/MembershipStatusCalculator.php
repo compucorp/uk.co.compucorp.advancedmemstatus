@@ -12,22 +12,36 @@ class CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator {
   public function __construct(&$membershipStatus, $arguments, $membership) {
     $this->membershipStatus = $membershipStatus;
     $this->arguments = $arguments;
-    $this->membership = $membership;
+    $this->membership = $this->getMembership($membership['membership_id']);
+  }
+
+  private function getMembership($membershipID) {
+    return civicrm_api3('Membership', 'getsingle', [
+      'id' => $membershipID,
+    ]);
   }
 
   public function calculate() {
-    $exceptionRulesForMembershipType = $this->getExceptionRulesForMembershipType();
-    if (in_array($this->membershipStatus, $exceptionRulesForMembershipType)) {
+    if ($this->isMembershipStatusExcludedFromMembershipType()) {
       $membershipNewStatus = $this->getMembershipStatusByDate();
       $this->membershipStatus['name'] = $membershipNewStatus['name'];
       $this->membershipStatus['id'] = $membershipNewStatus['id'];
     }
   }
 
-  private function getExceptionRulesForMembershipType() {
-    $currentMembershipType = $this->membership->membership_type_id;
+  private function isMembershipStatusExcludedFromMembershipType() {
+    $exceptionRulesForMembershipType = $this->getExceptionRulesForMembershipType();
 
-    return [];
+    if (in_array($this->membershipStatus['id'], $exceptionRulesForMembershipType)) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  private function getExceptionRulesForMembershipType() {
+    $currentMembershipType = $this->membership['membership_type_id'];
+    return CRM_AdvancedMemStatus_Service_StatusExclusionManager::getExclusionsForMembershipType($currentMembershipType);
   }
 
   private function getMembershipStatusByDate(
