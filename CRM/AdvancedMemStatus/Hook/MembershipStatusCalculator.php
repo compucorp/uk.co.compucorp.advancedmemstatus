@@ -1,5 +1,6 @@
 <?php
 
+use CRM_AdvancedMemStatus_Service_StatusExclusionManager as StatusExclusionManager;
 
 class CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator {
 
@@ -31,9 +32,8 @@ class CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator {
   }
 
   private function getExceptionStatusesForMembershipType() {
-    $currentMembershipType = $this->membership['membership_type_id'];
-
-    return [3];  // TODO: replace [3] with outside call to get Statuses expcetions
+    $membershipType = $this->arguments['membership_type_id'];
+    return StatusExclusionManager::getExclusionsForMembershipType($membershipType);
   }
 
   private function recalculateMembershipStatus() {
