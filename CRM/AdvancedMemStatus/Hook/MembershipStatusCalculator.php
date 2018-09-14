@@ -10,46 +10,52 @@ class CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator {
   private $membership;
 
   public function __construct(&$membershipStatus, $arguments, $membership) {
-    $this->membershipStatus = $membershipStatus;
+    $this->membershipStatus = &$membershipStatus;
     $this->arguments = $arguments;
     $this->membership = $membership;
   }
 
   public function calculate() {
-    $exceptionRulesForMembershipType = $this->getExceptionRulesForMembershipType();
-    if (in_array($this->membershipStatus, $exceptionRulesForMembershipType)) {
-      $membershipNewStatus = $this->getMembershipStatusByDate();
-      $this->membershipStatus['name'] = $membershipNewStatus['name'];
-      $this->membershipStatus['id'] = $membershipNewStatus['id'];
+    if ($this->isStatusDoesNotApplyToMembership($this->membershipStatus['id'])) {
+      $this->recalculateMembershipStatus();
     }
   }
 
-  private function getExceptionRulesForMembershipType() {
-    $currentMembershipType = $this->membership->membership_type_id;
+  private function isStatusDoesNotApplyToMembership($statusId) {
+    $exceptionStatusesForMembershipType = $this->getExceptionStatusesForMembershipType();
+    if (in_array($statusId, $exceptionStatusesForMembershipType)) {
+      return TRUE;
+    }
 
-    return [];
+    return FALSE;
   }
 
-  private function getMembershipStatusByDate(
-    $startDate, $endDate, $joinDate,
-    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = array()
-  ) {
+  private function getExceptionStatusesForMembershipType() {
+    $currentMembershipType = $this->membership['membership_type_id'];
+
+    return [3];  // TODO: replace [3] with outside call to get Statuses expcetions
+  }
+
+  private function recalculateMembershipStatus() {
+    $membershipNewStatus = $this->getMembershipStatusByDate();
+
+    $this->membershipStatus['name'] = $membershipNewStatus['name'];
+    $this->membershipStatus['id'] = $membershipNewStatus['id'];
+  }
+
+  private function getMembershipStatusByDate() {
+    $startDate = $this->arguments['start_date'];
+    $endDate = $this->arguments['end_date'];
+    $joinDate = $this->arguments['join_date'];
+    $statusDate =  $this->arguments['status_date'];
+
+    $excludeIsAdmin = FALSE;
+    if (empty($this->membership['is_override'])) {
+      $excludeIsAdmin = TRUE;
+    }
+
     $membershipDetails = array();
-    if (!$statusDate || $statusDate == 'today') {
-      $statusDate = getdate();
-      $statusDate = date('Ymd',
-        mktime($statusDate['hours'],
-          $statusDate['minutes'],
-          $statusDate['seconds'],
-          $statusDate['mon'],
-          $statusDate['mday'],
-          $statusDate['year']
-        )
-      );
-    }
-    else {
-      $statusDate = CRM_Utils_Date::customFormat($statusDate, '%Y%m%d');
-    }
+
     $dates = array('start', 'end', 'join');
     $events = array('start', 'end');
     foreach ($dates as $dat) {
@@ -77,6 +83,10 @@ class CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator {
     $membershipStatus = CRM_Core_DAO::executeQuery($query);
     $hour = $minute = $second = 0;
     while ($membershipStatus->fetch()) {
+      if ($this->isStatusDoesNotApplyToMembership($membershipStatus->id)) {
+        continue;
+      }
+
       $startEvent = NULL;
       $endEvent = NULL;
       foreach ($events as $eve) {
@@ -139,26 +149,15 @@ class CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator {
           $membershipDetails['name'] = $membershipStatus->name;
         }
       }
-      // returns FIRST status record for which status_date is in range.
+
       if ($membershipDetails) {
         break;
       }
     }
     //end fetch
     $membershipStatus->free();
-    //we bundle the arguments into an array as we can't pass 8 variables to the hook otherwise
-    // the membership array might contain the pre-altered settings so we don't want to merge this
-    $arguments = array(
-      'start_date' => $startDate,
-      'end_date' => $endDate,
-      'join_date' => $joinDate,
-      'status_date' => $statusDate,
-      'exclude_is_admin' => $endDate,
-      'membership_type_id' => $membershipTypeID,
-      'start_event' => $startEvent,
-      'end_event' => $endEvent,
-    );
-    CRM_Utils_Hook::alterCalculatedMembershipStatus($membershipDetails, $arguments, $membership);
+
     return $membershipDetails;
   }
+  
 }
