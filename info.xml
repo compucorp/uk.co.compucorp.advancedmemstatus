@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="uk.co.compucorp.advancedmemstatus" type="module">
   <file>advancedmemstatus</file>
-  <name>FIXME</name>
+  <name>Advanced Membership Status</name>
   <description>FIXME</description>
   <license>AGPL-3.0</license>
   <maintainer>

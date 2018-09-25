@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CustomData>
+    <CustomGroups>
+        <CustomGroup>
+            <name>membership_status_exceptions</name>
+            <title>Membership Status Exceptions</title>
+            <extends>MembershipType</extends>
+            <style>Inline</style>
+            <collapse_display>1</collapse_display>
+            <is_active>1</is_active>
+            <table_name>civicrm_value_membership_status_exceptions</table_name>
+            <is_multiple>0</is_multiple>
+            <collapse_adv_display>0</collapse_adv_display>
+            <is_reserved>0</is_reserved>
+            <is_public>1</is_public>
+        </CustomGroup>
+    </CustomGroups>
+    <CustomFields>
+        <CustomField>
+            <name>excluded_membership_statuses</name>
+            <label>Excluded Membership Statuses</label>
+            <data_type>String</data_type>
+            <html_type>Multi-Select</html_type>
+            <is_required>0</is_required>
+            <is_searchable>1</is_searchable>
+            <is_search_range>0</is_search_range>
+            <weight>1</weight>
+            <is_active>1</is_active>
+            <is_view>0</is_view>
+            <text_length>255</text_length>
+            <note_columns>60</note_columns>
+            <note_rows>4</note_rows>
+            <column_name>excluded_membership_statuses</column_name>
+            <option_group_name>excluded_membership_statuses</option_group_name>
+            <custom_group_name>membership_status_exceptions</custom_group_name>
+        </CustomField>
+    </CustomFields>
+    <OptionGroups>
+        <OptionGroup>
+            <name>excluded_membership_statuses</name>
+            <title>Excluded Membership Statuses</title>
+            <is_reserved>0</is_reserved>
+            <is_active>1</is_active>
+
+        </OptionGroup>
+    </OptionGroups>
+</CustomData>
