@@ -134,35 +134,12 @@ function advancedmemstatus_civicrm_entityTypes(&$entityTypes) {
   _advancedmemstatus_civix_civicrm_entityTypes($entityTypes);
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function advancedmemstatus_civicrm_preProcess($formName, &$form) {
-
-} // */
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
-function advancedmemstatus_civicrm_navigationMenu(&$menu) {
-  _advancedmemstatus_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _advancedmemstatus_civix_navigationMenu($menu);
-} // */
-
 function advancedmemstatus_civicrm_postSave_civicrm_membership_status($dao) {
   $syncer = new CRM_Advancedmemstatus_Hook_MembershipStatusesSyncer();
   $syncer->sync($dao->id);
+}
+
+function advancedmemstatus_civicrm_alterCalculatedMembershipStatus(&$membershipStatus, $arguments, $membership) {
+  $membershipStatusCalculator = new CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator($membershipStatus, $arguments, $membership);
+  $membershipStatusCalculator->calculate();
 }
