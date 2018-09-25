@@ -17,14 +17,14 @@ class CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator {
   }
 
   public function calculate() {
-    if ($this->isStatusDoesNotApplyToMembership($this->membershipStatus['id'])) {
+    if ($this->isStatusDoesNotApplyToMembership($this->membershipStatus['name'])) {
       $this->recalculateMembershipStatus();
     }
   }
 
-  private function isStatusDoesNotApplyToMembership($statusId) {
+  private function isStatusDoesNotApplyToMembership($statusName) {
     $exceptionStatusesForMembershipType = $this->getExceptionStatusesForMembershipType();
-    if (in_array($statusId, $exceptionStatusesForMembershipType)) {
+    if (in_array($statusName, $exceptionStatusesForMembershipType)) {
       return TRUE;
     }
 
@@ -83,7 +83,7 @@ class CRM_AdvancedMemStatus_Hook_MembershipStatusCalculator {
     $membershipStatus = CRM_Core_DAO::executeQuery($query);
     $hour = $minute = $second = 0;
     while ($membershipStatus->fetch()) {
-      if ($this->isStatusDoesNotApplyToMembership($membershipStatus->id)) {
+      if ($this->isStatusDoesNotApplyToMembership($membershipStatus->name)) {
         continue;
       }
 
