@@ -161,3 +161,8 @@ function advancedmemstatus_civicrm_navigationMenu(&$menu) {
   ));
   _advancedmemstatus_civix_navigationMenu($menu);
 } // */
+
+function advancedmemstatus_civicrm_postSave_civicrm_membership_status($dao) {
+  $syncer = new CRM_Advancedmemstatus_Hook_MembershipStatusesSyncer();
+  $syncer->sync($dao->id);
+}
